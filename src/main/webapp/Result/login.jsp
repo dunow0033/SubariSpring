@@ -5,6 +5,7 @@
 </head>
 <body>
 <form:form action="LoginResult" method="post" modelAttribute="userobj">
+<h1 style="color: red;">Welcome to Subari!!</h1>
 <table>
 	<tr>
 		<td>Username</td>
@@ -16,7 +17,7 @@
 	</tr>
 	<tr>
 		<td></td>
-		<td><input type="submit" value="Login" /></td>
+		<td><input type="submit" value="Login" /><input style="float: right;" type="submit" value="Register" /></td>
 	</tr>
 </table>
 
