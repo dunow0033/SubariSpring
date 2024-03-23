@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -20,6 +22,7 @@ public class LoginController {
 	
 	Connection con = null;
 	Statement stmt = null;
+	PreparedStatement stat;
 	ResultSet usernameResults = null;
 	ResultSet passwordResults = null;
 	
@@ -29,14 +32,13 @@ public class LoginController {
 	}
 	
 	@RequestMapping("/")
-	public String displayform()
+	public ModelAndView displayform()
 	{
-		//return new ModelAndView("login", "userobj", new User());
-		return "login";
+		return new ModelAndView("login", "userobj", new User());
 	}
 	
-	@RequestMapping("/LoginResult")
-	public ModelAndView retrieveData(@ModelAttribute("userobj") User u)
+	@PostMapping("/LoginResult")
+	public ModelAndView matchUserData(@ModelAttribute("userobj") User u)
 	{	
 		
 		boolean userFound = false;
@@ -48,8 +50,7 @@ public class LoginController {
             String query = "SELECT username, password FROM user";
             ResultSet results = stmt.executeQuery(query);
             
-            //if (u.getName() != null)
-            	System.out.println(u.getName());
+         
             
             while(results.next()) {
                 String username = results.getString("username");
@@ -80,6 +81,42 @@ public class LoginController {
         }
         
         return new ModelAndView("loginError", "error", "some other error");
+	}
+	
+	@RequestMapping("/register")
+	public ModelAndView registrationForm()
+	{
+		return new ModelAndView("register", "userobj", new User());
+	}
+	
+	@PostMapping("/RegistrationResult")
+	public ModelAndView registerUser(@ModelAttribute("userobj") User u)
+	{	
+        
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+            stat = con.prepareStatement("insert into student values(?, ?, ?, ?)");
+            
+            stat.setInt(1, u.getUserid());
+    		stat.setString(2, u.getName());
+    		stat.setString(3, u.getPassword());
+    		stat.setString(4, u.getUsername());
+    		
+    		int result = stat.executeUpdate();
+    		if(result > 0)
+    		{
+    			System.out.println("Data inserted successfully");
+    			return new ModelAndView("regSuccess", "success", "success");
+    		}
+    		else {
+    			return new ModelAndView("regError", "error", "some other error");
+    		}
+    	}
+    	catch(SQLException ex)
+    	{
+    		System.out.println("Exception is " + ex.getMessage());
+    		return new ModelAndView("regError", "error", "some other error");
+    	}
 	}
 }
 
