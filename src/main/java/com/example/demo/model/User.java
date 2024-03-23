@@ -17,10 +17,10 @@ public class User {
 	private String name;
 	
 	@Column(name="Username")
-	private String username;
+	public String username;
 	
 	@Column(name="Password")
-	private String password;
+	public String password;
 	
 	public int getUserid() {
 		return userid;

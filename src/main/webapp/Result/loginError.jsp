@@ -4,11 +4,9 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Subari Main Page</title>
+<title>Login Error!!</title>
 </head>
 <body>
-<h1>Logged in!! Success!!</h1>
-
-<p>Hello, ${userobj.name}, welcome!!!</p>
+<h1 style="color: red; font-style: italic; font-weight: bold;">Login Error!!!</h1>
 </body>
 </html>
