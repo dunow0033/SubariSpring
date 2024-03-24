@@ -95,7 +95,7 @@ public class LoginController {
         
         try {
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
-            stat = con.prepareStatement("insert into student values(?, ?, ?, ?)");
+            stat = con.prepareStatement("insert into user values(?, ?, ?, ?)");
             
             stat.setInt(1, u.getUserid());
     		stat.setString(2, u.getName());
