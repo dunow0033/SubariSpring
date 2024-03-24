@@ -20,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.example.demo.model.Cart;
 import com.example.demo.model.Food;
+import com.example.demo.model.OrderItem;
 import com.example.demo.model.User;
 import com.example.demo.repository.FoodRepository;
 
@@ -70,8 +71,12 @@ public class MenuController {
             stat.setInt(1, c.getCartid());
     		stat.setTimestamp(2, Timestamp.valueOf(c.getDate()));
     		stat.setString(3, c.getUsername());
-    		stat.setString(4, c.getFood());
-    		stat.setInt(5, c.getQuantity());
+    		
+    		List<OrderItem> orderItems = c.getOrderItems();
+    		for(OrderItem item : orderItems) {
+    			stat = con.prepareStatement("INSERT INTO order_item (Food, Quantity, OrderId) VALUES (?, ?, ?)");
+    			stat.setString(1, item.getFood().getName());
+    		}
     		
     		stat.executeUpdate();
 		}

@@ -18,7 +18,7 @@ public class Cart {
 	@Id
 	@Column(name="Cartid")
 	private int cartid;
-	
+
 	@Column(name="Date")
 	public LocalDateTime date;
 	
@@ -52,5 +52,11 @@ public class Cart {
 		this.username = username;
 	}
 	
-	
+	public List<OrderItem> getOrderItems() {
+		return orderItems;
+	}
+
+	public void setOrderItems(List<OrderItem> orderItems) {
+		this.orderItems = orderItems;
+	}	
 }
