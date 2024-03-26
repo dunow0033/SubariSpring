@@ -16,8 +16,8 @@ public class OrderItem {
 	private int orderid;
 	
 	@ManyToOne
-	@JoinColumn(name="Food", nullable=false)
-	private Food food;
+	@JoinColumn(name="FoodId", nullable=false)
+	private int foodid;
 	
 	@Column(name="Quantity")
 	private int quantity;
@@ -30,12 +30,12 @@ public class OrderItem {
 		this.orderid = orderid;
 	}
 
-	public Food getFood() {
-		return food;
+	public int getFoodId() {
+		return foodid;
 	}
 
-	public void setFood(Food food) {
-		this.food = food;
+	public void setFoodId(int foodid) {
+		this.foodid = foodid;
 	}
 
 	public int getQuantity() {
