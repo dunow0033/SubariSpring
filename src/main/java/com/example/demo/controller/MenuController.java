@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -40,7 +41,7 @@ public class MenuController {
 	Statement stmt = null;
 	PreparedStatement stat;
 	
-	@PersistenceContext EntityManager entityManager;
+	//@PersistenceContext EntityManager entityManager;
 
 	@GetMapping("/mainMenu")
 	public ModelAndView getMainMenu()
@@ -52,7 +53,6 @@ public class MenuController {
             stmt = con.createStatement();
             String query = "SELECT name, price FROM food";
             ResultSet results = stmt.executeQuery(query);
-            
 
             while(results.next()) {
                 String name = results.getString("name");
@@ -77,35 +77,35 @@ public class MenuController {
 //		//This page displays all items chosen and the final bill.	
 //	}
 	
-	@PostMapping("/sendCart")
-	public ModelAndView sendCart(@ModelAttribute("cartobj") Cart c)
-	{
-		try {
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
-            stat = con.prepareStatement("insert into cart (Cartid, Date, Username) values(?, ?, ?)");
-            
-            stat.setInt(1, c.getCartid());
-    		stat.setTimestamp(2, Timestamp.valueOf(c.getDate()));
-    		stat.setString(3, c.getUsername());
-    		
-    		List<OrderItem> orderItems = c.getOrderItems();
-    		for(OrderItem item : orderItems) {
-    			stat = con.prepareStatement("INSERT INTO order_item (Food, Quantity, OrderId) VALUES (?, ?, ?)");
-    			
-    			stat.setInt(1, item.getFoodId());
-    			stat.setInt(2, item.getQuantity());
-    			stat.setInt(3, c.getCartid());
-    		
-    			stat.executeUpdate();
-    		}
-		}
-		catch(SQLException e)
-		{
-			System.out.println(e.getMessage());
-		}
-		
-		return new ModelAndView("mainMenu", "foodList", foodList);
-	}
+//	@PostMapping("/sendCart")
+//	public ModelAndView sendCart(@ModelAttribute("cartobj") Cart c)
+//	{
+//		try {
+//			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+//            stat = con.prepareStatement("insert into cart (Cartid, Date, Username) values(?, ?, ?)");
+//            
+//            stat.setInt(1, c.getCartid());
+//    		stat.setTimestamp(2, Timestamp.valueOf(c.getDate()));
+//    		stat.setString(3, c.getUsername());
+//    		
+//    		List<OrderItem> orderItems = c.getOrderItems();
+//    		for(OrderItem item : orderItems) {
+//    			stat = con.prepareStatement("INSERT INTO order_item (Food, Quantity, OrderId) VALUES (?, ?, ?)");
+//    			
+//    			stat.setInt(1, item.getFoodId());
+//    			stat.setInt(2, item.getQuantity());
+//    			stat.setInt(3, c.getCartid());
+//    		
+//    			stat.executeUpdate();
+//    		}
+//		}
+//		catch(SQLException e)
+//		{
+//			System.out.println(e.getMessage());
+//		}
+//		
+//		return new ModelAndView("mainMenu", "foodList", foodList);
+//	}
 	
 	@GetMapping("/orderHistory/{id}")
 	public String getOrderHistory(@PathVariable("id") int userid)
@@ -121,13 +121,13 @@ public class MenuController {
             	int cartid = results.getInt("Cartid");
             	LocalDateTime date = results.getTimestamp("Date").toLocalDateTime();
             	
-            	List<OrderItem> orderItems = getOrderItemsForDisplay(cartid);
+            	//List<OrderItem> orderItems = getOrderItemsForDisplay(cartid);
             	
-                for(OrderItem item : orderItems) {
-                	System.out.println("Date: " + date);
-                	System.out.println("Food: " + item.getFoodId());
-                	System.out.println("Quantity: " + item.getQuantity());
-                }
+//                for(OrderItem item : orderItems) {
+//                	System.out.println("Date: " + date);
+//                	//System.out.println("Food: " + item.getFoodId());
+//                	System.out.println("Quantity: " + item.getQuantity());
+//                }
             }
 		
 		} catch(SQLException e) {
@@ -137,40 +137,92 @@ public class MenuController {
 		return "orderHistory";
 	}
 	
-	public List<OrderItem> getOrderItemsForDisplay(int cartId) {
-		String jpql = "SELECT oi FROM OrderItem oi WHERE oi.cart.cartid = :cartId";
-		TypedQuery<OrderItem> query = entityManager.createQuery(jpql, OrderItem.class);
-		query.setParameter("cartId", cartId);
-		return query.getResultList();
+//	public List<OrderItem> getOrderItemsForDisplay(int cartId) {
+//		String jpql = "SELECT oi FROM OrderItem oi WHERE oi.cart.cartid = :cartId";
+//		TypedQuery<OrderItem> query = entityManager.createQuery(jpql, OrderItem.class);
+//		query.setParameter("cartId", cartId);
+//		return query.getResultList();
+//	}
+	
+	@RequestMapping("/adminCreateUser")
+	public ModelAndView adminCreateUserForm()
+	{
+		return new ModelAndView("createUser", "userobj", new User());
 	}
 	
-	@PostMapping("/createUser")
-	public ModelAndView createUser(@ModelAttribute("userobj") User u)
+	@PostMapping("/adminRegistrationResult")
+	public ModelAndView adminCreateUser(@ModelAttribute("userobj") User u)
+	{	
+        
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+            stat = con.prepareStatement("insert into user values(?, ?, ?, ?)");
+            
+            stat.setInt(1, u.getUserid());
+    		stat.setString(2, u.getName());
+    		stat.setString(3, u.getPassword());
+    		stat.setString(4, u.getUsername());
+    		
+    		int result = stat.executeUpdate();
+    		if(result > 0)
+    		{
+    			return new ModelAndView("regSuccess", "success", "success");
+    		}
+    		else {
+    			return new ModelAndView("regError", "error", "some other error");
+    		}
+    	}
+    	catch(SQLException ex)
+    	{
+    		System.out.println("Exception is " + ex.getMessage());
+    		return new ModelAndView("regError", "error", "some other error");
+    	}
+	}
+	
+	@RequestMapping("/adminViewAllUsers")
+	public ModelAndView adminViewAllUsers()
+	{
+		List<String> userList = new ArrayList<String>();
+		
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+			stmt = con.createStatement();
+            String query = "SELECT name FROM user";
+            ResultSet results = stmt.executeQuery(query);
+            
+            while(results.next()) {
+                String name = results.getString("name");
+                userList.add(name);
+            }
+		  } 
+		catch(SQLException ex)
+		{
+			System.out.println("Exception is " + ex.getMessage());
+    		return new ModelAndView("regError", "error", "some other error");		
+    	}
+		
+		return new ModelAndView("adminUserList", "userList", userList);
+	}    
+	
+	@PutMapping("/editUser/{userid}")
+	public ModelAndView adminEditUserForm(@PathVariable int userid)
 	{
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
-            stat = con.prepareStatement("insert into cart (Cartid, Date, Username) values(?, ?, ?)");
+			stmt = con.createStatement();
+            String query = "UPDATE * FROM user WHERE id =" + userid;
+            ResultSet results = stmt.executeQuery(query);
             
-            stat.setInt(1, c.getCartid());
-    		stat.setTimestamp(2, Timestamp.valueOf(c.getDate()));
-    		stat.setString(3, c.getUsername());
-    		
-    		List<OrderItem> orderItems = c.getOrderItems();
-    		for(OrderItem item : orderItems) {
-    			stat = con.prepareStatement("INSERT INTO order_item (Food, Quantity, OrderId) VALUES (?, ?, ?)");
-    			
-    			stat.setInt(1, item.getFoodId());
-    			stat.setInt(2, item.getQuantity());
-    			stat.setInt(3, c.getCartid());
-    		
-    			stat.executeUpdate();
-    		}
-		}
-		catch(SQLException e)
+            while(results.next()) {
+                String name = results.getString("name");
+
+            }
+		  } 
+		catch(SQLException ex)
 		{
-			System.out.println(e.getMessage());
-		}
-		
-		return new ModelAndView("mainMenu", "foodList", foodList);
+			System.out.println("Exception is " + ex.getMessage());
+    		return new ModelAndView("regError", "error", "some other error");		
+    	}
+		return new ModelAndView("createUser", "userobj", new User());
 	}
 }

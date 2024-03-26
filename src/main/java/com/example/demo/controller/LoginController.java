@@ -105,7 +105,6 @@ public class LoginController {
     		int result = stat.executeUpdate();
     		if(result > 0)
     		{
-    			System.out.println("Data inserted successfully");
     			return new ModelAndView("regSuccess", "success", "success");
     		}
     		else {

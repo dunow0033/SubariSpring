@@ -16,8 +16,12 @@ public class OrderItem {
 	private int orderid;
 	
 	@ManyToOne
-	@JoinColumn(name="FoodId", nullable=false)
-	private int foodid;
+    @JoinColumn(name = "Cartid", nullable = false)
+    private Cart cart;
+	
+	@ManyToOne
+	@JoinColumn(name="Food", nullable=false)
+	private Food food;
 	
 	@Column(name="Quantity")
 	private int quantity;
@@ -30,13 +34,13 @@ public class OrderItem {
 		this.orderid = orderid;
 	}
 
-	public int getFoodId() {
-		return foodid;
-	}
-
-	public void setFoodId(int foodid) {
-		this.foodid = foodid;
-	}
+//	public int getFoodId() {
+//		return foodid;
+//	}
+//
+//	public void setFoodId(int foodid) {
+//		this.foodid = foodid;
+//	}
 
 	public int getQuantity() {
 		return quantity;
