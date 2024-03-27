@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Admin - List of USers</title>
+<title>Admin - List of Users</title>
 </head>
 <body>
 

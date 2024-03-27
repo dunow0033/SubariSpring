@@ -204,19 +204,25 @@ public class MenuController {
 		return new ModelAndView("adminUserList", "userList", userList);
 	}    
 	
-	@PutMapping("/editUser/{userid}")
-	public ModelAndView adminEditUserForm(@PathVariable int userid)
+	@GetMapping("/adminEditUserForm")
+	public String adminEditUserForm()
+	{
+		return "adminEditUser";
+	}
+	
+	@PutMapping("/adminEditUserResult/{userid}")
+	public ModelAndView adminEditUserResult(@ModelAttribute("userobj") User u, @PathVariable int userid)
 	{
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
-			stmt = con.createStatement();
-            String query = "UPDATE * FROM user WHERE id =" + userid;
-            ResultSet results = stmt.executeQuery(query);
+            PreparedStatement stat = con.prepareStatement("UPDATE user SET name = ?, username = ?, password = ? WHERE userid = ?");
             
-            while(results.next()) {
-                String name = results.getString("name");
-
-            }
+            stat.setString(1, u.getName());
+            stat.setString(2, u.getUsername());
+            stat.setString(3, u.getPassword());
+            stat.setInt(4, u.getUserid());
+            
+            stat.executeUpdate();
 		  } 
 		catch(SQLException ex)
 		{
