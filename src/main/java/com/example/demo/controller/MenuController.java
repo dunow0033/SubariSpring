@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -144,7 +145,7 @@ public class MenuController {
 //		return query.getResultList();
 //	}
 	
-	@RequestMapping("/adminCreateUser")
+	@GetMapping("/adminCreateUser")
 	public ModelAndView adminCreateUserForm()
 	{
 		return new ModelAndView("createUser", "userobj", new User());
@@ -230,5 +231,82 @@ public class MenuController {
     		return new ModelAndView("regError", "error", "some other error");		
     	}
 		return new ModelAndView("createUser", "userobj", new User());
+	}
+	
+	@GetMapping("/deleteUserRequest/{userid}")
+	public String deleteUserRequest(@PathVariable int userid)
+	{
+		return "redirect:/adminDeleteUserResult/" + userid;
+	}
+	
+	@DeleteMapping("/adminDeleteUserResult/{userid}")
+	public ModelAndView adminDeleteUserResult(@PathVariable int userid)
+	{
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+			
+			PreparedStatement name = con.prepareStatement("SELECT name FROM user WHERE userid = ?");
+			name.setInt(1, userid);
+			ResultSet rs = name.executeQuery();
+			String userName = "";
+			if(rs.next()) {
+				userName = rs.getString("name");
+			}
+			
+            PreparedStatement stat = con.prepareStatement("DELETE FROM user WHERE userid = ?");
+            stat.setInt(1, userid);
+            int rowsAffected = stat.executeUpdate();
+            
+            if(rowsAffected > 0)
+            {
+            	return new ModelAndView("deleteSuccess", "message", name);
+            }
+            else 
+            {
+            	return new ModelAndView("deleteSuccess", "message", name);
+            }
+		  }
+		catch(SQLException ex)
+		{
+			System.out.println(ex.getMessage());
+		}
+		
+		return new ModelAndView("deleteSuccess", "message", "name");
+	}
+	
+	@GetMapping("/adminCreateFood")
+	public ModelAndView adminCreateFoodForm()
+	{
+		return new ModelAndView("createFood", "foodobj", new Food("green beans", 2));
+	}
+	
+	@PostMapping("/adminCreateFoodResult")
+	public ModelAndView adminCreateFoodResult(@ModelAttribute("foodobj") Food f)
+	{	
+        
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+            stat = con.prepareStatement("INSERT INTO FOOD values(?, ?, ?)");
+            
+            stat.setInt(1, 11);
+    		stat.setString(2, f.getName());
+    		stat.setDouble(3, f.getPrice());
+    		
+    		int result = stat.executeUpdate();
+    		
+    		if(result > 0)
+    		{
+    			return new ModelAndView("createFoodSuccess", "success", "success");
+    		}
+    		else 
+    		{
+    			return new ModelAndView("createFoodError", "error", "some other error");
+    		}
+    	}
+    	catch(SQLException ex)
+    	{
+    		System.out.println("Exception is " + ex.getMessage());
+    		return new ModelAndView("createFoodError", "error", "some other error");
+    	}
 	}
 }
