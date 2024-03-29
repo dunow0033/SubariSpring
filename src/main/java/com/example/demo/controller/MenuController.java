@@ -336,4 +336,31 @@ public class MenuController {
 		
 		return new ModelAndView("adminFoodList", "foodList", foodList);
 	}
+	
+	@GetMapping("/adminEditFoodForm")
+	public String adminEditFoodForm()
+	{
+		return "adminEditFood";
+	}
+	
+	@PutMapping("/adminEditFoodResult/{foodid}")
+	public ModelAndView adminEditFoodResult(@ModelAttribute("foodobj") Food f, @PathVariable int foodid)
+	{
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+            PreparedStatement stat = con.prepareStatement("UPDATE food SET name = ?, price = ? WHERE foodid = ?");
+            
+            stat.setString(1, f.getName());
+            stat.setDouble(2, f.getPrice());;
+            stat.setInt(3, f.getFoodid());
+            
+            stat.executeUpdate();
+		  } 
+		catch(SQLException ex)
+		{
+			System.out.println("Exception is " + ex.getMessage());
+    		return new ModelAndView("regError", "error", "some other error");		
+    	}
+		return new ModelAndView("createUser", "userobj", new User());
+	}
 }
