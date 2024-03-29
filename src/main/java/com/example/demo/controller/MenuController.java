@@ -277,7 +277,7 @@ public class MenuController {
 	@GetMapping("/adminCreateFood")
 	public ModelAndView adminCreateFoodForm()
 	{
-		return new ModelAndView("createFood", "foodobj", new Food("green beans", 2));
+		return new ModelAndView("createFood", "foodobj", new Food());
 	}
 	
 	@PostMapping("/adminCreateFoodResult")
@@ -288,7 +288,7 @@ public class MenuController {
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
             stat = con.prepareStatement("INSERT INTO FOOD values(?, ?, ?)");
             
-            stat.setInt(1, 11);
+            stat.setInt(1, 21);
     		stat.setString(2, f.getName());
     		stat.setDouble(3, f.getPrice());
     		
@@ -308,5 +308,32 @@ public class MenuController {
     		System.out.println("Exception is " + ex.getMessage());
     		return new ModelAndView("createFoodError", "error", "some other error");
     	}
+	}
+	
+	@RequestMapping("/adminViewAllFoods")
+	public ModelAndView adminViewAllFoods()
+	{
+		List<Food> foodList = new ArrayList<Food>();
+		
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+			stmt = con.createStatement();
+            String query = "SELECT name, price FROM food";
+            ResultSet results = stmt.executeQuery(query);
+            
+            while(results.next()) {
+                String name = results.getString("name");
+                double price = results.getDouble("price");
+                Food food = new Food(name, price);
+                foodList.add(food);
+            }
+		  } 
+		catch(SQLException ex)
+		{
+			System.out.println("Exception is " + ex.getMessage());
+    		return new ModelAndView("regError", "error", "some other error");		
+    	}
+		
+		return new ModelAndView("adminFoodList", "foodList", foodList);
 	}
 }

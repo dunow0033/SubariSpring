@@ -19,6 +19,11 @@ public class Food {
 	@Column(name="Price")
 	public double price;
 	
+	public Food()
+	{
+		
+	}
+	
 	public Food(String name, double price)
 	{
 		this.name = name;
