@@ -363,4 +363,45 @@ public class MenuController {
     	}
 		return new ModelAndView("createUser", "userobj", new User());
 	}
+	
+	@GetMapping("/deleteFoodRequest/{foodid}")
+	public String deleteFoodRequest(@PathVariable int foodid)
+	{
+		return "redirect:/adminDeleteFoodResult/" + foodid;
+	}
+	
+	@DeleteMapping("/adminDeleteFoodResult/{foodid}")
+	public ModelAndView adminDeleteFoodResult(@PathVariable int foodid)
+	{
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+			
+			PreparedStatement name = con.prepareStatement("SELECT name FROM food WHERE foodid = ?");
+			name.setInt(1, foodid);
+			ResultSet rs = name.executeQuery();
+			String userName = "";
+			if(rs.next()) {
+				userName = rs.getString("name");
+			}
+			
+            PreparedStatement stat = con.prepareStatement("DELETE FROM food WHERE foodid = ?");
+            stat.setInt(1, userid);
+            int rowsAffected = stat.executeUpdate();
+            
+            if(rowsAffected > 0)
+            {
+            	return new ModelAndView("deleteSuccess", "message", name);
+            }
+            else 
+            {
+            	return new ModelAndView("deleteSuccess", "message", name);
+            }
+		  }
+		catch(SQLException ex)
+		{
+			System.out.println(ex.getMessage());
+		}
+		
+		return new ModelAndView("deleteSuccess", "message", "name");
+	}
 }
