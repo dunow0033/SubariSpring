@@ -50,7 +50,7 @@ public class Food {
 		return price;
 	}
 
-	private void setPrice(double price) {
+	public void setPrice(double price) {
 		this.price = price;
 	}
 }

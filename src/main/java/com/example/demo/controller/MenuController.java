@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.example.demo.model.Bill;
 import com.example.demo.model.Cart;
 import com.example.demo.model.Food;
 import com.example.demo.model.OrderItem;
@@ -379,13 +382,13 @@ public class MenuController {
 			PreparedStatement name = con.prepareStatement("SELECT name FROM food WHERE foodid = ?");
 			name.setInt(1, foodid);
 			ResultSet rs = name.executeQuery();
-			String userName = "";
+			String foodName = "";
 			if(rs.next()) {
-				userName = rs.getString("name");
+				foodName = rs.getString("name");
 			}
 			
             PreparedStatement stat = con.prepareStatement("DELETE FROM food WHERE foodid = ?");
-            stat.setInt(1, userid);
+            stat.setInt(1, foodid);
             int rowsAffected = stat.executeUpdate();
             
             if(rowsAffected > 0)
@@ -403,5 +406,161 @@ public class MenuController {
 		}
 		
 		return new ModelAndView("deleteSuccess", "message", "name");
+	}
+	
+	private List<Bill> getTodaysBills()
+	{
+		List<Bill> bills = new ArrayList<>();
+		
+		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+	            PreparedStatement stmt = con.prepareStatement("SELECT * FROM Cart WHERE Date = ?")) {
+
+	            LocalDate today = LocalDate.now();
+	            stmt.setDate(1, Date.valueOf(today));
+	            
+	            try(ResultSet rs = stmt.executeQuery()) {
+	            	while(rs.next()) {
+	            		int cartId = rs.getInt("Cartid");
+	            		LocalDateTime date = rs.getTimestamp("Date").toLocalDateTime();
+	            		String username = rs.getString("Username");
+	            		
+	            		List<OrderItem> orderItems = getOrderItemsForCart(cartId);
+	            		
+	            		double totalAmount = calculateTotalAmount(orderItems);
+	            		
+	            		Bill bill = new Bill(cartId, date, username, totalAmount);
+	            		bills.add(bill);
+	            	}
+	            }
+	            catch(SQLException e) {
+	            	e.getMessage();
+	            }
+	            
+		} catch(SQLException e)
+		{
+			e.getMessage();
+		}
+		
+		return bills;
+	}
+	
+	@GetMapping("/adminViewTodaysBills")
+	public ModelAndView adminViewTodaysBills()
+	{
+		List<Bill> todaysBills = getTodaysBills();
+		
+		return new ModelAndView("adminViewTodaysBills", "todaysBills", todaysBills);
+	}
+	
+	private List<OrderItem> getOrderItemsForCart(int cartId) 
+	{
+		List<OrderItem> orderItemList = new ArrayList<OrderItem>();
+		
+		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+	    PreparedStatement stmt = con.prepareStatement("SELECT * FROM OrderItem WHERE Cartid = ?")) {
+			
+			stmt.setInt(1, cartId);
+			
+			try (ResultSet rs = stmt.executeQuery()){
+				while(rs.next()) {
+					OrderItem oi = new OrderItem();
+					oi.setOrderid(rs.getInt("OrderId"));
+					int foodId = rs.getInt("Food");
+					Food food = fetchFoodById(foodId);
+					oi.setFood(food);
+					
+					oi.setQuantity(rs.getInt("Quantity"));
+					
+					orderItemList.add(oi);		
+				}
+			}
+			
+		}
+		catch(SQLException e) {
+			e.getMessage();
+		}
+		
+		return orderItemList;
+	}
+	
+	private double calculateTotalAmount(List<OrderItem> orderItems)
+	{
+		double total = 0.0;
+		for(OrderItem item : orderItems) {
+			total += item.getFood().getPrice() * item.getQuantity();
+		}
+		
+		return total;
+	}
+		
+	private Food fetchFoodById(int foodId)
+	{
+		Food food = new Food();
+		
+		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+		
+		PreparedStatement stmt = con.prepareStatement("SELECT * FROM Food WHERE foodid = ?")) {
+			stmt.setInt(1, foodId);
+			
+			try(ResultSet rs = stmt.executeQuery()) {
+				while(rs.next()) {
+					food.setFoodid(rs.getInt("foodId"));
+					food.setName(rs.getString("name"));
+					food.setPrice(rs.getDouble("price"));	
+				}
+			}
+			
+		}
+		catch(SQLException e)
+		{
+			e.getMessage();
+		}
+		
+		return food;
+	}
+	
+	private double getCurrentMonthTotalSales()
+	{
+		double totalAmount = 0;
+		
+		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+	            PreparedStatement stmt = con.prepareStatement("SELECT * FROM Cart WHERE Date BETWEEN ? AND ?")) {
+
+				LocalDate firstDayofMonth = LocalDate.now().withDayOfMonth(1);
+	            LocalDate today = LocalDate.now();
+	            
+	            stmt.setDate(1, Date.valueOf(firstDayofMonth));
+	            stmt.setDate(2, Date.valueOf(today));
+	            
+	            try(ResultSet rs = stmt.executeQuery()) {
+	            	while(rs.next()) {
+	            		int cartId = rs.getInt("Cartid");
+	            		LocalDateTime date = rs.getTimestamp("Date").toLocalDateTime();
+	            		String username = rs.getString("Username");
+	            		
+	            		List<OrderItem> orderItems = getOrderItemsForCart(cartId);
+	            		
+	            		totalAmount = calculateTotalAmount(orderItems);
+	            	}
+	            }
+	            catch(SQLException e) {
+	            	e.getMessage();
+	            }
+	            
+		} 
+		catch(SQLException e)
+		{
+			e.getMessage();
+		}
+		
+		return totalAmount;	
+	}
+	
+	@GetMapping("/adminViewCurrentMonthSales")
+	public ModelAndView adminViewCurrentMonthSales()
+	{
+		double currentMonthSales = getCurrentMonthTotalSales();
+		
+		return new ModelAndView("adminViewCurrentMonthSales", "currentMonthSales", currentMonthSales);
 	}
 }
