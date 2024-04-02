@@ -13,7 +13,11 @@
 
 <ol>
 	<c:forEach items="${viewAllOrdersForUser}" var="order">
-		<li>${order.username} -- ${order.food.price}</li>
+		 <li>
+            Food: ${order.food.name}<br>
+            Quantity: ${order.quantity}<br>
+            Total Price: ${order.quantity * order.food.price}<br>
+        </li>
 	</c:forEach>
 </ol>
 
