@@ -20,7 +20,7 @@ public class OrderItem {
     private Cart cart;
 	
 	@ManyToOne
-	@JoinColumn(name="Foodid", nullable=false)
+	@JoinColumn(name="Food", nullable=false)
 	private Food food;
 	
 	@Column(name="Quantity")

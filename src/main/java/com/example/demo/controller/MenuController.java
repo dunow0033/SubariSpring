@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.example.demo.model.Bill;
@@ -562,5 +563,44 @@ public class MenuController {
 		double currentMonthSales = getCurrentMonthTotalSales();
 		
 		return new ModelAndView("adminViewCurrentMonthSales", "currentMonthSales", currentMonthSales);
+	}
+	
+	private List<OrderItem> getAllOrdersForUser(String username) 
+	{
+		List<OrderItem> orderItemList = new ArrayList<OrderItem>();
+		
+		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+	    PreparedStatement stmt = con.prepareStatement("SELECT * FROM Cart WHERE Username = ?")) {
+			
+			stmt.setString(1, username);
+			
+			try (ResultSet rs = stmt.executeQuery()){
+				while(rs.next()) {
+					int cartId = rs.getInt("Cartid");					
+					List<OrderItem> itemsForCart = getOrderItemsForCart(cartId);
+					
+					orderItemList.addAll(itemsForCart);		
+				}
+			}
+			
+		}
+		catch(SQLException e) {
+			e.getMessage();
+		}
+		
+		return orderItemList;
+	}
+	
+	@GetMapping("/adminViewAllOrdersForUser")
+	public ModelAndView adminViewAllOrdersForUser(@RequestParam(name="name") String username)
+	{
+		List<OrderItem> viewAllOrdersForUser = getAllOrdersForUser(username);
+		
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.addObject("AllOrdersForUser", viewAllOrdersForUser);
+		modelAndView.addObject("username", username);
+		modelAndView.setViewName("adminViewAllOrdersForUser");
+		
+		return modelAndView;
 	}
 }
