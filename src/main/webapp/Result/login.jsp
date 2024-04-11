@@ -17,7 +17,8 @@
 	</tr>
 	<tr>
 		<td></td>
-		<td><input type="submit" value="Login" /><input style="float: right;" type="submit" value="Register" /></td>
+		<td><input type="submit" value="Login" />
+		<a href="/register"><input style="float: right;" type="submit" value="Register" /></a></td>
 	</tr>
 </table>
 

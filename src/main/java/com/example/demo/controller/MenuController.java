@@ -74,6 +74,12 @@ public class MenuController {
 		return new ModelAndView("mainMenu", "foodList", foodList);
 	}
 	
+	@GetMapping("/adminMainMenu")
+	public String getAdminMainMenu()
+	{	
+		return "adminMainMenu";
+	}
+	
 //	@RequestMapping("/orderConfirmation")
 //	public ModelAndView orderConf(@ModelAttribute("cartobj") Cart c)
 //	{
@@ -148,6 +154,12 @@ public class MenuController {
 //		query.setParameter("cartId", cartId);
 //		return query.getResultList();
 //	}
+	
+	@GetMapping("/adminViewUserOptions")
+	public String adminViewUserOptions()
+	{
+		return "adminViewUserOptions";
+	}
 	
 	@GetMapping("/adminCreateUser")
 	public ModelAndView adminCreateUserForm()
