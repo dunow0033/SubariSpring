@@ -269,15 +269,41 @@ public class MenuController {
 		return new ModelAndView("createUser", "userobj", new User());
 	}
 	
-	@GetMapping("/deleteUserRequest/{userid}")
-	public String deleteUserRequest(@PathVariable int userid)
+	@GetMapping("/adminDeleteUser")
+	public ModelAndView adminDeleteUserForm()
 	{
-		return "redirect:/adminDeleteUserResult/" + userid;
+		List<String> userList = new ArrayList<String>();
+		
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+			stmt = con.createStatement();
+            String query = "SELECT name FROM user";
+            ResultSet results = stmt.executeQuery(query);
+            
+            while(results.next()) {
+                String name = results.getString("name");
+                userList.add(name);
+            }
+		  } 
+		catch(SQLException ex)
+		{
+			System.out.println("Exception is " + ex.getMessage());
+    		return new ModelAndView("regError", "error", "some other error");		
+    	}
+		
+		return new ModelAndView("admin/adminDeleteUser", "userList", userList);
 	}
 	
-	@DeleteMapping("/adminDeleteUserResult/{userid}")
-	public ModelAndView adminDeleteUserResult(@PathVariable int userid)
+//	@GetMapping("/deleteUserRequest/{userid}")
+//	public String deleteUserRequest(@PathVariable int userid)
+//	{
+//		return "redirect:/adminDeleteUserResult/" + userid;
+//	}
+	
+	@PostMapping("/adminDeleteResult")
+	public ModelAndView adminDeleteUserResult(@RequestParam(value = "userId", required = true) int[] userIds)
 	{
+		if(userIds != null &&)
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
 			
@@ -309,6 +335,41 @@ public class MenuController {
 		
 		return new ModelAndView("deleteSuccess", "message", "name");
 	}
+	
+//	@DeleteMapping("/adminDeleteUserResult/{userid}")
+//	public ModelAndView adminDeleteUserResult(@PathVariable int userid)
+//	{
+//		try {
+//			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+//			
+//			PreparedStatement name = con.prepareStatement("SELECT name FROM user WHERE userid = ?");
+//			name.setInt(1, userid);
+//			ResultSet rs = name.executeQuery();
+//			String userName = "";
+//			if(rs.next()) {
+//				userName = rs.getString("name");
+//			}
+//			
+//            PreparedStatement stat = con.prepareStatement("DELETE FROM user WHERE userid = ?");
+//            stat.setInt(1, userid);
+//            int rowsAffected = stat.executeUpdate();
+//            
+//            if(rowsAffected > 0)
+//            {
+//            	return new ModelAndView("deleteSuccess", "message", name);
+//            }
+//            else 
+//            {
+//            	return new ModelAndView("deleteSuccess", "message", name);
+//            }
+//		  }
+//		catch(SQLException ex)
+//		{
+//			System.out.println(ex.getMessage());
+//		}
+//		
+//		return new ModelAndView("deleteSuccess", "message", "name");
+//	}
 	
 	@GetMapping("/adminCreateFood")
 	public ModelAndView adminCreateFoodForm()
