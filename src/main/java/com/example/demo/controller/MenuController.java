@@ -272,17 +272,22 @@ public class MenuController {
 	@GetMapping("/adminDeleteUser")
 	public ModelAndView adminDeleteUserForm()
 	{
-		List<String> userList = new ArrayList<String>();
+		List<User> userList = new ArrayList<User>();
 		
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
 			stmt = con.createStatement();
-            String query = "SELECT name FROM user";
+            String query = "SELECT * FROM user";
             ResultSet results = stmt.executeQuery(query);
             
             while(results.next()) {
-                String name = results.getString("name");
-                userList.add(name);
+            	User user = new User();
+            	user.setUserid(results.getInt("userid"));
+                user.setName(results.getString("name"));
+                user.setUsername(results.getString("username"));
+                user.setPassword(results.getString("password"));
+                userList.add(user);
+              
             }
 		  } 
 		catch(SQLException ex)
@@ -303,37 +308,40 @@ public class MenuController {
 	@PostMapping("/adminDeleteResult")
 	public ModelAndView adminDeleteUserResult(@RequestParam(value = "userId", required = true) int[] userIds)
 	{
-		if(userIds != null &&)
-		try {
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+		if(userIds != null && userIds.length > 0) {
+			try {
+				con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
 			
-			PreparedStatement name = con.prepareStatement("SELECT name FROM user WHERE userid = ?");
-			name.setInt(1, userid);
-			ResultSet rs = name.executeQuery();
-			String userName = "";
-			if(rs.next()) {
-				userName = rs.getString("name");
-			}
+			for(int userId : userIds) {
+				PreparedStatement name = con.prepareStatement("SELECT name FROM user WHERE userid = ?");
+				name.setInt(1, userId);
 			
-            PreparedStatement stat = con.prepareStatement("DELETE FROM user WHERE userid = ?");
-            stat.setInt(1, userid);
-            int rowsAffected = stat.executeUpdate();
+				ResultSet rs = name.executeQuery();
+				String userName = "";
+				if(rs.next()) {
+					userName = rs.getString("name");
+				}
+			
+				PreparedStatement stat = con.prepareStatement("DELETE FROM user WHERE userid = ?");
+				stat.setInt(1, userId);
+				int rowsAffected = stat.executeUpdate();
             
-            if(rowsAffected > 0)
-            {
-            	return new ModelAndView("deleteSuccess", "message", name);
-            }
-            else 
-            {
-            	return new ModelAndView("deleteSuccess", "message", name);
-            }
-		  }
+				if(rowsAffected > 0)
+				{
+					return new ModelAndView("deleteSuccess", "message", name);
+				}
+				else 
+				{
+					return new ModelAndView("deleteSuccess", "message", name);
+				}
+			}
+		}
 		catch(SQLException ex)
 		{
 			System.out.println(ex.getMessage());
 		}
-		
-		return new ModelAndView("deleteSuccess", "message", "name");
+	}
+			return new ModelAndView("deleteSuccess", "message", "name");
 	}
 	
 //	@DeleteMapping("/adminDeleteUserResult/{userid}")

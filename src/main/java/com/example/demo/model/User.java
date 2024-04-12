@@ -11,10 +11,10 @@ public class User {
 	
 	@Id
 	@Column(name="Userid")
-	private int userid;
+	public int userid;
 	
 	@Column(name="Name")
-	private String name;
+	public String name;
 	
 	@Column(name="Username")
 	public String username;
