@@ -4,7 +4,7 @@
 <title>Admin - Create User Page</title>
 </head>
 <body>
-<form:form action="AdminRegistrationResult" method="post" modelAttribute="userobj">
+<form:form action="adminRegistrationResult" method="post" modelAttribute="userobj">
 <h1 style="color: red;">Admin - Create User Page</h1>
 <table>
 	<tr>
