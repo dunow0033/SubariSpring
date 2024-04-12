@@ -77,7 +77,7 @@ public class MenuController {
 	@GetMapping("/adminMainMenu")
 	public String getAdminMainMenu()
 	{	
-		return "adminMainMenu";
+		return "admin/adminMainMenu";
 	}
 	
 //	@RequestMapping("/orderConfirmation")
@@ -156,15 +156,35 @@ public class MenuController {
 //	}
 	
 	@GetMapping("/adminViewUserOptions")
-	public String adminViewUserOptions()
+	public ModelAndView adminViewUserOptions()
 	{
-		return "adminViewUserOptions";
+		
+		List<String> userList = new ArrayList<String>();
+		
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+			stmt = con.createStatement();
+            String query = "SELECT name FROM user";
+            ResultSet results = stmt.executeQuery(query);
+            
+            while(results.next()) {
+                String name = results.getString("name");
+                userList.add(name);
+            }
+		  } 
+		catch(SQLException ex)
+		{
+			System.out.println("Exception is " + ex.getMessage());
+    		return new ModelAndView("regError", "error", "some other error");		
+    	}
+		
+		return new ModelAndView("admin/adminViewUserOptions", "userList", userList);
 	}
 	
 	@GetMapping("/adminCreateUser")
 	public ModelAndView adminCreateUserForm()
 	{
-		return new ModelAndView("createUser", "userobj", new User());
+		return new ModelAndView("admin/adminCreateUser", "userobj", new User());
 	}
 	
 	@PostMapping("/adminRegistrationResult")

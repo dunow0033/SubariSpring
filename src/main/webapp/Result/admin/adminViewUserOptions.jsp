@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,27 +9,48 @@
 <style>
 	.center {
 		margin: auto;
-		width:60%;
 		text-align: center;
+		margin-bottom: 20px;
 	}
 </style>
+<script>
+window.onload = function() {
+	document.getElementById("userList").style.display = "none";
+};
+
+function toggleUserList() {
+	var selectElement = document.getElementById("optionSelect");
+	var userListElement = document.getElementById("userList");
+	
+	if(selectElement.value === "adminViewUsers") {
+		userListElement.style.display = "block";
+	} else {
+		userListElement.style.display = "none";
+	}
+}
+</script>
 </head>
 <body>
 
-<h1 style="margin:auto; width: 50%; color: red; font-style: italic; font-weight: bold;">Admin -- Menu of User Options</h1>
+<h1 style="margin:auto; text-align: center; color: red; font-style: italic; font-weight: bold;">Menu of User Options</h1>
 
 <div class="center">
-	<select>
-		<option value="/adminViewUserNames">View User Names</option>
-		<option value="/adminTodaysBills">View Today's Bills</option>
-		<option value="/adminViewCurrentMonthTotalSale">View Current Month Total Sale</option>
-		<option value="/adminViewFoodOptions">View Food Options</option>
+	<select id="optionSelect" onchange="toggleUserList();window.location.href=this.value;">
+		<option>Choose an Option</option>
+		<option value="adminViewUsers">View Users</option>
+		<option value="/adminCreateUser">Create User</option>
+		<option value="/adminUpdateUser">Update User</option>
+		<option value="/adminDeleteUser">Delete User</option>
 	</select>
 </div>
 
-<p id="content">
-
-</p>
+<div class="center" id="userList">
+	<p>
+		<c:forEach items="${userList}" var="user">
+			<c:out value="${user}" /><br>
+		</c:forEach>
+	</p>
+</div>
 
 </body>
 </html>
