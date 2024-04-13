@@ -241,10 +241,10 @@ public class MenuController {
 		return new ModelAndView("adminUserList", "userList", userList);
 	}    
 	
-	@GetMapping("/adminEditUserForm")
-	public String adminEditUserForm()
+	@GetMapping("/adminUpdateUser")
+	public ModelAndView adminUpdateUserForm()
 	{
-		return "adminEditUser";
+		return new ModelAndView("admin/adminUpdateUser", "userobj", new User());
 	}
 	
 	@PutMapping("/adminEditUserResult/{userid}")

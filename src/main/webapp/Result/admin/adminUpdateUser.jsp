@@ -1,11 +1,11 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html>
 <head>
-<title>Admin - Edit User Page</title>
+<title>Admin - Update User Page</title>
 </head>
 <body>
-<form:form action="AdminEditUserResult" method="post" modelAttribute="userobj">
-<h1 style="color: red;">Admin - Edit User Page</h1>
+<form:form action="AdminUpdateUserResult" method="post" modelAttribute="userobj">
+<h1 style="color: red;">Admin - Update User Page</h1>
 <table>
 	<tr>
 		<td>First Name and Last Name</td>
