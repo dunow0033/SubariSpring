@@ -244,7 +244,31 @@ public class MenuController {
 	@GetMapping("/adminUpdateUser")
 	public ModelAndView adminUpdateUserForm()
 	{
-		return new ModelAndView("admin/adminUpdateUser", "userobj", new User());
+		List<User> userList = new ArrayList<User>();
+		
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+			stmt = con.createStatement();
+            String query = "SELECT * FROM user";
+            ResultSet results = stmt.executeQuery(query);
+            
+            while(results.next()) {
+            	User user = new User();
+            	user.setUserid(results.getInt("userid"));
+                user.setName(results.getString("name"));
+                user.setUsername(results.getString("username"));
+                user.setPassword(results.getString("password"));
+                userList.add(user);
+              
+            }
+		  } 
+		catch(SQLException ex)
+		{
+			System.out.println("Exception is " + ex.getMessage());
+    		return new ModelAndView("regError", "error", "some other error");		
+    	}
+		
+		return new ModelAndView("admin/adminUpdateUserList", "userList", userList);
 	}
 	
 	@PutMapping("/adminEditUserResult/{userid}")
