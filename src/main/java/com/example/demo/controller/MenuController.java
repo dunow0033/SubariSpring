@@ -238,7 +238,7 @@ public class MenuController {
     		return new ModelAndView("regError", "error", "some other error");		
     	}
 		
-		return new ModelAndView("adminUserList", "userList", userList);
+		return new ModelAndView("admin/adminUserList", "userList", userList);
 	}    
 	
 	@GetMapping("/adminUpdateUser")
@@ -271,26 +271,80 @@ public class MenuController {
 		return new ModelAndView("admin/adminUpdateUserList", "userList", userList);
 	}
 	
-	@PutMapping("/adminEditUserResult/{userid}")
-	public ModelAndView adminEditUserResult(@ModelAttribute("userobj") User u, @PathVariable int userid)
+	@PostMapping("/adminUpdateUserForm")
+	public ModelAndView adminUpdateUserForm(@RequestParam(value = "userid", required = true) int userid)
 	{
+		ModelAndView modelAndView = null;
+		
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
-            PreparedStatement stat = con.prepareStatement("UPDATE user SET name = ?, username = ?, password = ? WHERE userid = ?");
+			
+			PreparedStatement getUserData = con.prepareStatement("SELECT * FROM user WHERE userid = ?");
+			getUserData.setInt(1, userid);
+			ResultSet rs = getUserData.executeQuery();
+			
+			if(rs.next()) {
+				
+				String name = rs.getString("name");
+				String username = rs.getString("username");
+				String password = rs.getString("password");
+				
+				User user = new User();
+				user.setName(name);
+				user.setUsername(username);
+				user.setPassword(password);
+				
+				modelAndView = new ModelAndView("admin/adminUpdateUserForm");
+				modelAndView.addObject("userid", userid);
+				modelAndView.addObject("userobj", user);
+			}
+			
+			
+		} catch(SQLException e) {
+			return new ModelAndView("errorPage", "message", "An error occurred");
+		}
+		
+		return modelAndView;
+	}	
+	
+	@PostMapping("/adminUpdateUserResult")
+	public ModelAndView adminUpdateUserResult(@RequestParam("userid") int userid,
+												@ModelAttribute("userobj") User user)
+	{
+			try {
+				con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+			
+				PreparedStatement getUserData = con.prepareStatement("SELECT * FROM user WHERE userid = ?");
+				getUserData.setInt(1, userid);
+				ResultSet rs = getUserData.executeQuery();
+				
+				if(rs.next()) {
+					PreparedStatement updateUser = con.prepareStatement("UPDATE user SET name = ?, username = ?, password = ? WHERE userid = ?");
+					updateUser.setString(1, user.getName());
+					updateUser.setString(2,  user.getUsername());
+					updateUser.setString(3,  user.getPassword());
+					updateUser.setInt(4, userid);
+					int rowsAffected = updateUser.executeUpdate();
             
-            stat.setString(1, u.getName());
-            stat.setString(2, u.getUsername());
-            stat.setString(3, u.getPassword());
-            stat.setInt(4, u.getUserid());
-            
-            stat.executeUpdate();
-		  } 
+					if(rowsAffected > 0)
+					{
+						System.out.println("hi");
+						return new ModelAndView("admin/adminUpdateUserSuccess", "message", user.getName());
+					}
+					else 
+					{
+						System.out.println("hi2");
+						return new ModelAndView("regError", "message", user.getName());
+					}
+				}
+			}
 		catch(SQLException ex)
 		{
-			System.out.println("Exception is " + ex.getMessage());
-    		return new ModelAndView("regError", "error", "some other error");		
-    	}
-		return new ModelAndView("createUser", "userobj", new User());
+			System.out.println("hi3");
+			System.out.println(ex.getMessage());
+		}
+			System.out.println("hi56");
+			return new ModelAndView("admin/adminUpdateUserSuccess", "message", user.getName());
 	}
 	
 	@GetMapping("/adminDeleteUser")

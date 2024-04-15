@@ -49,7 +49,7 @@ function toggleUserList() {
 <div class="center">
 	<select id="optionSelect" onchange="window.location.href=this.value;">
 		<option>Choose an Option</option>
-		<option value="adminViewUsers">View Users</option>
+		<option value="/adminViewAllUsers">View Users</option>
 		<option value="/adminCreateUser">Create User</option>
 		<option value="/adminUpdateUser">Update User</option>
 		<option value="/adminDeleteUser">Delete User</option>
