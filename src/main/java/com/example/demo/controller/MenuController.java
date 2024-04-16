@@ -48,9 +48,11 @@ public class MenuController {
 	
 	//@PersistenceContext EntityManager entityManager;
 
-	@GetMapping("/mainMenu")
-	public ModelAndView getMainMenu()
+	@GetMapping("/mainUserPage")
+	public ModelAndView getMainMenu(@RequestParam("name") String name)
 	{
+		ModelAndView mainUserPage = new ModelAndView("mainUserPage");
+		
 		List<Food> foodList = new ArrayList<Food>();
 		
 		try {
@@ -60,9 +62,9 @@ public class MenuController {
             ResultSet results = stmt.executeQuery(query);
 
             while(results.next()) {
-                String name = results.getString("name");
+                String foodName = results.getString("name");
                 double price = results.getDouble("price");
-                Food food = new Food(name, price);
+                Food food = new Food(foodName, price);
                 foodList.add(food);
             }
 		}
@@ -71,7 +73,11 @@ public class MenuController {
 			System.out.println(e.getMessage());
 		}
 		
-		return new ModelAndView("mainMenu", "foodList", foodList);
+		mainUserPage.addObject("foodList", foodList);
+		mainUserPage.addObject("name", name);
+		
+		return mainUserPage;
+		
 	}
 	
 	@GetMapping("/adminMainMenu")

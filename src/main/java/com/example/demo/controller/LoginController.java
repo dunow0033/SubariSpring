@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.dto.LoginDTO;
 import com.example.demo.model.User;
@@ -46,65 +48,64 @@ public class LoginController {
 		//return new ModelAndView("login");
 	}
 	
-	@PostMapping("/LoginResult")
+	//@PostMapping("/LoginResult")
 	//public ModelAndView loginEmployee(@BindingResult LoginDTO loginDTO)
-	public ModelAndView loginEmployee(@ModelAttribute("userobj") LoginDTO loginDTO)
-	{
-		User user = userService.loginUser(loginDTO);
-		return new ModelAndView("success", "name", user);
-	}
-	
-//	@PostMapping("/LoginResult")
-//	public ModelAndView matchUserData(@ModelAttribute("userobj") User u)
-//	{	
-//		
-//		boolean userFound = false;
-//        boolean passwordMatch = false;
-//        
-//        try {
-//            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
-//            stmt = con.createStatement();
-//            String query = "SELECT username, password FROM user";
-//            ResultSet results = stmt.executeQuery(query);
-//            
-//         
-//            
-//            while(results.next()) {
-//                String username = results.getString("username");
-//                String password = results.getString("password");
-//                
-//                System.out.println(username);
-//                
-////                if(u.getUsername().equals("admin"))
-////                {
-////                	return new ModelAndView("redirect:/adminMainMenu");
-////                }
-//                
-//                if (u.getUsername().equals(username)) {
-//                    userFound = true;
-//                    if (u.getPassword().equals(password)) {
-//                        passwordMatch = true;
-//                        break;
-//                    }
-//                }
-//            }
-//            
-//            
-//            if (userFound && passwordMatch) {
-//                return new ModelAndView("success", "username", u.getName());
-//            } else if (userFound) {
-//                return new ModelAndView("loginError", "error", "Invalid password");
-//            } else {
-//                return new ModelAndView("loginError", "error", "User not found");
-//            }
-//        }
-//        catch(SQLException e)
-//        {
-//        	System.out.println(e.getMessage());
-//        }
-//        
-//        return new ModelAndView("loginError", "error", "some other error");
+//	public ModelAndView loginEmployee(@ModelAttribute("userobj") LoginDTO loginDTO)
+//	{
+//		User user = userService.loginUser(loginDTO);
+//		return new ModelAndView("success", "name", user);
 //	}
+	
+	@PostMapping("/LoginResult")
+	public ModelAndView matchUserData(@ModelAttribute("userobj") User u, 
+									@RequestParam String username, 
+									@RequestParam String password,
+									RedirectAttributes redirectAttributes)
+	{
+		
+		boolean userFound = false;
+        String name = null;
+        
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+            stmt = con.createStatement();
+            String query = "SELECT * FROM user";
+            ResultSet results = stmt.executeQuery(query);
+            
+         
+            
+            while(results.next()) {
+                String Dusername = results.getString("username");
+                
+                //System.out.println(username);
+                
+                if(username.equals("admin"))
+                {
+                	return new ModelAndView("redirect:/adminMainMenu");
+                }
+                else if (username.equals(Dusername)) {
+                	userFound = true;
+                	name = results.getString("name");
+                }
+            }
+            
+            
+                if (userFound) {
+                	redirectAttributes.addAttribute("name", name);
+                    return new ModelAndView("redirect:/mainUserPage");
+            	} else if (!userFound) {
+                	return new ModelAndView("loginError", "error", "Invalid password");
+            	} else {
+                	return new ModelAndView("loginError", "error", "User not found");
+            	}
+        }
+        catch(SQLException e)
+        {
+        	System.out.println(e.getMessage());
+        }
+        
+        return new ModelAndView("loginError", "error", "some other error");
+	}
 	
 	@GetMapping("/register")
 	public String registrationForm(Model model){
