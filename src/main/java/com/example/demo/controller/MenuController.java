@@ -340,10 +340,8 @@ public class MenuController {
 			}
 		catch(SQLException ex)
 		{
-			System.out.println("hi3");
 			System.out.println(ex.getMessage());
 		}
-			System.out.println("hi56");
 			return new ModelAndView("admin/adminUpdateUserSuccess", "message", user.getName());
 	}
 	

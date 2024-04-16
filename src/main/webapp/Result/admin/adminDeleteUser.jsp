@@ -3,6 +3,11 @@
 <html>
 <head>
 <title>Admin - Delete User Page</title>
+<script>
+    function confirmDeletion() {
+        return confirm("Are you sure you want to delete the selected user(s)?");
+    }
+</script>
 </head>
 <body>
 <h1 style="color: red;">Admin - Delete User Page</h1>
@@ -17,8 +22,8 @@
             	<c:out value="${user.name}" />
         	</div>
 		</c:forEach>
-	</p>
-	<input type="submit" value="Delete" />
+    </p>
+    <input type="submit" value="Delete" onclick="return confirmDeletion();"/>
 </div>
 </form:form>
 
