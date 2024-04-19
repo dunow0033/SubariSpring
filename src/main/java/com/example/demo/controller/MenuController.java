@@ -52,6 +52,16 @@ public class MenuController {
 	public ModelAndView getMainMenu(@RequestParam("name") String name)
 	{
 		ModelAndView mainUserPage = new ModelAndView("mainUserPage");
+		mainUserPage.addObject("name", name);
+		
+		return mainUserPage;
+		
+	}
+	
+	@GetMapping("/ViewFoodMenu")
+	public ModelAndView viewFoodMenu(@RequestParam("name") String name)
+	{
+		ModelAndView mainMenu = new ModelAndView("mainMenu");
 		
 		List<Food> foodList = new ArrayList<Food>();
 		
@@ -73,11 +83,10 @@ public class MenuController {
 			System.out.println(e.getMessage());
 		}
 		
-		mainUserPage.addObject("foodList", foodList);
-		mainUserPage.addObject("name", name);
+		mainMenu.addObject("foodList", foodList);
+		mainMenu.addObject("name", name);
 		
-		return mainUserPage;
-		
+		return mainMenu;
 	}
 	
 	@GetMapping("/adminMainMenu")

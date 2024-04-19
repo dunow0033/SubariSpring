@@ -23,7 +23,7 @@
 <div class="center">
 	<select id="optionSelect" onchange="window.location.href=this.value;">
 		<option>Choose an Option</option>
-		<option value="/ViewFoodMenu">View Food Menu</option>
+		<option value="/ViewFoodMenu?name=${name}">View Food Menu</option>
 		<option value="/ViewOrderHistory">View Order History</option>
 	</select>
 </div>
