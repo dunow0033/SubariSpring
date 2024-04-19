@@ -56,11 +56,9 @@ public class LoginController {
 //		return new ModelAndView("success", "name", user);
 //	}
 	
-	@PostMapping("/LoginResult")
-	public ModelAndView matchUserData(@ModelAttribute("userobj") User u, 
-									@RequestParam String username, 
-									@RequestParam String password,
-									RedirectAttributes redirectAttributes)
+	/*@PostMapping("/LoginResult")
+	public ModelAndView matchUserData(@ModelAttribute("userobj") User u)
+	//public ModelAndView matchUserData(@ModelAttribute("userobj") User u, @RequestParam String username, @RequestParam String password, RedirectAttributes redirectAttributes)
 	{
 		
 		boolean userFound = false;
@@ -79,11 +77,11 @@ public class LoginController {
                 
                 //System.out.println(username);
                 
-                if(username.equals("admin"))
-                {
-                	return new ModelAndView("redirect:/adminMainMenu");
-                }
-                else if (username.equals(Dusername)) {
+                //if(username.equals("admin"))
+                //{
+                	//return new ModelAndView("redirect:/adminMainMenu");
+                //}
+                if (u.getUsername(Dusername)) {
                 	userFound = true;
                 	name = results.getString("name");
                 }
@@ -104,6 +102,52 @@ public class LoginController {
         	System.out.println(e.getMessage());
         }
         
+        return new ModelAndView("loginError", "error", "some other error");
+	}*/
+	
+	@PostMapping("/LoginResult")
+	public ModelAndView matchUserData(@ModelAttribute("userobj") User u)
+	{	
+
+		boolean userFound = false;
+        boolean passwordMatch = false;
+
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hiberprj", "root", "bdiver1");
+            stmt = con.createStatement();
+            String query = "SELECT username, password, name FROM user";
+            ResultSet results = stmt.executeQuery(query);
+            String name = "";
+
+            while(results.next()) {
+                String username = results.getString("username");
+                String password = results.getString("password");
+                name = results.getString("name");
+                
+                System.out.println(name);
+
+                if (u.getUsername().equals(username)) {
+                    userFound = true;
+                    if (u.getPassword().equals(password)) {
+                        passwordMatch = true;
+                        break;
+                    }
+                }
+            }
+
+            if (userFound && passwordMatch) {
+                return new ModelAndView("mainUserPage", "name", name);
+            } else if (userFound) {
+                return new ModelAndView("loginError", "error", "Invalid password");
+            } else {
+                return new ModelAndView("loginError", "error", "User not found");
+            }
+        }
+        catch(SQLException e)
+        {
+        	System.out.println(e.getMessage());
+        }
+
         return new ModelAndView("loginError", "error", "some other error");
 	}
 	

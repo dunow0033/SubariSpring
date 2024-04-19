@@ -38,6 +38,29 @@
 <script>
 	function handleCheckboxClick(checkbox, itemName, itemPrice)
 	{
+		var orderItems = document.querySelectorAll(".order-item");
+		var alreadyExists = false;
+		
+		/*for(var i = 0; i < orderItems.length; i++) {
+			var itemDesc = orderItems[i].querySelector("span");
+			if(itemDesc.textContent === itemName + " -- " + itemPrice) {
+				alreadyExists = true;
+				break;
+			}
+		}*/
+		
+		if(!checkbox.checked) {
+			for(var i = 0; i < orderItems.length; i++) {
+				var itemDesc = orderItems[i].querySelector("span");
+				if(itemDesc.textContent === itemName + " -- " + itemPrice) {
+					orderItems[i].remove();
+					updateTotalQuantity();
+					updateTotalPrice();
+					break;
+				}
+			}
+		}
+		
 		if(checkbox.checked) {
 			
 			var newItem = document.createElement("div");
@@ -51,6 +74,7 @@
 			minusButton.onclick = function() {
 				updateQuantity(newItem, -1);
 				updateTotalQuantity();
+				updateTotalPrice();
 			};
 			minusButton.style.marginRight = "5px";
 			
@@ -63,6 +87,7 @@
 			plusButton.onclick = function() {
 				updateQuantity(newItem, 1);
 				updateTotalQuantity();
+				updateTotalPrice();
 			};
 			plusButton.style.marginLeft = "5px";
 			
@@ -81,6 +106,8 @@
 			document.getElementById("order").appendChild(newItem);
 			
 			updateTotalQuantity();
+			
+			updateTotalPrice();
 		}
 	}
 	
@@ -88,6 +115,12 @@
 		var totalQuantitySpan = document.getElementById("total_quantity");
 	    var totalQuantity = calculateTotalQuantity();
 	    totalQuantitySpan.textContent = "Total Quantity: " + totalQuantity;
+	}
+	
+	function updateTotalPrice() {
+		var totalPriceSpan = document.getElementById("total_price");
+	    var totalPrice = calculateTotalPrice();
+	    totalPriceSpan.textContent = "Total Price: " + totalPrice;
 	}
 	
 	function calculateTotalQuantity() {
@@ -98,6 +131,16 @@
 		}
 		
 		return totalQuantity;
+	}
+	
+	function calculateTotalPrice() {
+		var priceSpans = document.querySelectorAll(".total_price");
+		var totalPrice = 0.00;
+		for(var i = 0; i < priceSpans.length; i++) {
+			totalPrice += parseFloat(priceSpans[i].textContent);
+		}
+		
+		return totalPrice.toFixed(2);
 	}
 	
 	function updateQuantity(newItem, change) {
@@ -142,7 +185,8 @@
 </div>
 <div id="total_quantity">
 </div>
-<div id="total_price"></div>
+<div id="total_price">
+</div>
 
 </body>
 </html>
