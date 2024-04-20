@@ -35,6 +35,7 @@
             width: 100px; /* Adjust width as needed */
         }
 </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 	function handleCheckboxClick(checkbox, itemName, itemPrice)
 	{
@@ -156,6 +157,19 @@
 		} else {
 			//newItem.parentNode.removeChild(newItem);
 			newItem.remove();
+			var itemName = newItem.querySelector("span").textContent.split(" -- ")[0];
+	        //console.log(".order_" + itemName);
+	        
+	        console.log(itemName);
+	        
+	        console.log(typeof document.querySelector(".order_" + itemName));
+	        
+	        //document.querySelector('.order_' + itemName).checked = false;
+	        
+	        //$('.order_' + itemName).prop('checked', false);
+	        
+	        //console.log(typeof(document.querySelector("#order_" + itemName)));
+			//document.querySelector('.order_' + itemName).checked = false;
 		}
 
 	    // Update total price
@@ -173,7 +187,7 @@
 	<c:forEach items="${foodList}" var="item">
 		<li>
             <label class="checkbox-label">
-                <input type="checkbox" class="order_${item}" onclick="handleCheckboxClick(this, '${item.name}', ${item.price})" />
+                <input type="checkbox" class="order_${item.name}" onclick="handleCheckboxClick(this, '${item.name}', ${item.price})" />
             </label>
             ${item.name} -- ${item.price}
         </li>

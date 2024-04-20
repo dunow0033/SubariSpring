@@ -89,6 +89,12 @@ public class MenuController {
 		return mainMenu;
 	}
 	
+	@GetMapping("/ViewOrderHistory")
+	public String viewOrderHistory()
+	{
+		return "viewOrderHistory";
+	}
+	
 	@GetMapping("/adminMainMenu")
 	public String getAdminMainMenu()
 	{	
